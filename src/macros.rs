@@ -40,7 +40,10 @@ macro_rules! const_m128 {
     }};
 }
 
-#[cfg(all(target_feature = "sse2", not(feature = "scalar-math")))]
+#[cfg(all(
+    target_feature = "sse2",
+    not(any(feature = "scalar-math", feature = "std-simd"))
+))]
 macro_rules! const_f32x4 {
     ($fx4:expr) => {{
         let fx4 = $fx4;
@@ -48,12 +51,22 @@ macro_rules! const_f32x4 {
     }};
 }
 
-#[cfg(all(target_feature = "simd128", not(feature = "scalar-math")))]
+#[cfg(all(
+    target_feature = "simd128",
+    not(any(feature = "scalar-math", feature = "std-simd"))
+))]
 macro_rules! const_f32x4 {
     ($fx4:expr) => {{
         let fx4 = $fx4;
         unsafe { $crate::cast::Vec4Cast { fx4 }.v128 }
     }};
+}
+
+#[cfg(all(feature = "std-simd", not(feature = "scalar-math")))]
+macro_rules! const_mask32x4 {
+    ($ix4:expr) => {
+        unsafe { $crate::cast::IVec4Cast { ix4: $ix4 }.mask32x4 }
+    };
 }
 
 /// Creates a `Vec2` that can be used to initialize a constant value.
