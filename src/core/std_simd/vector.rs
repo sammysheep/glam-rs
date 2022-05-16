@@ -335,12 +335,18 @@ impl Vector3<f32> for f32x4 {
 
     #[inline]
     fn min_element(self) -> f32 {
-        self.reduce_min()
+        let v = self;
+        let v = f32x4_min(v, simd_swizzle!(v, [2, 2, 1, 1]));
+        let v = f32x4_min(v, simd_swizzle!(v, [1, 0, 0, 0]));
+        v[0]
     }
 
     #[inline]
     fn max_element(self) -> f32 {
-        self.reduce_max()
+        let v = self;
+        let v = f32x4_max(v, simd_swizzle!(v, [2, 2, 0, 0]));
+        let v = f32x4_max(v, simd_swizzle!(v, [1, 0, 0, 0]));
+        v[0]
     }
 
     #[inline]
